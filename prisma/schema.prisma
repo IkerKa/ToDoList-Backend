@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model tdl_tasks {
+  id        Int        @id @default(autoincrement())
+  checked   Int?
+  tasktext  String?
+  emoji     Int
+  username  String?    @db.VarChar(120)
+  tdl_users tdl_users? @relation(fields: [username], references: [username], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model tdl_users {
+  username  String      @id @db.VarChar(120)
+  password  String?     @db.VarChar(120)
+  tdl_tasks tdl_tasks[]
+}
