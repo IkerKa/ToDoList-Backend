@@ -10,13 +10,13 @@ CREATE TABLE tdl_users (
 
 CREATE TABLE tdl_tasks(
 
-  Id serial     --autoincremental pk
+  Id serial,     --autoincremental pk
   Checked INTEGER, --INTEGER??
   TaskText TEXT,
   Emoji INTEGER NOT NULL,
   Username VARCHAR(120),
 
-  FOREIGN KEY Username REFERENCES tdl_users(Username),
+  FOREIGN KEY (Username) REFERENCES tdl_users(Username),
   PRIMARY KEY (Id)
   
 );
