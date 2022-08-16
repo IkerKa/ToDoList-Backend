@@ -1,11 +1,14 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+const { StatusCodes } = require('http-status-codes')
+
 async function registerHandler(req, res, next) {
+  console.log(req.body)
   const { username, password } = req.body;
 
-  if ( password === "" ) {
-    res.statusCode = 400 // error
+  if ( password == null || password === "" ) {
+    res.statusCode = StatusCodes.BAD_REQUEST// error
     res.send({
       ok: false,
       msg: "Invalid password"
@@ -14,8 +17,8 @@ async function registerHandler(req, res, next) {
     return
   }
 
-  if ( username === "" ) {
-    res.statusCode = 400 // error
+  if ( username == null || username === "" ) {
+    res.statusCode = StatusCodes.BAD_REQUEST // error
     res.send({
       ok: false,
       msg: "Invalid username"
@@ -24,28 +27,34 @@ async function registerHandler(req, res, next) {
     return
   }
 
+  // INSERT INTO tdl_users VALUES(..., ...)
   await prisma.tdl_users.create({
     data: {
-      Username : username,
-      Password : password
+      username : username,
+      password : password
     }
   }).then(() => {
     // registro correcto
-    res.statusCode = 200
+    res.statusCode = StatusCodes.OK
     res.send({
       ok: true,
       msg: "Registered succesfully"
     })
   }).catch(e => {
     // error de registro
-    res.statusCode = 409
+    res.statusCode = StatusCodes.CONFLICT
     res.send({
       ok: false,
-      msg: ""
+      msg: e.msg
     })
   })
 }
 
 async function loginHandler(req, res, next) {
 
+}
+
+module.exports = {
+  registerHandler,
+  loginHandler
 }
