@@ -62,21 +62,37 @@ async function loginHandler(req, res, next) {
     return
   }
 
-  await prisma.tdl_users.findFirstOrThrow({
+  await prisma.tdl_users.findUniqueOrThrow({
     where: {
-      username,
-      password
+      username
     }   
   })
-  .then(u => {
-    var token = jwt.sign({ name: username }, process.env.TOKEN_SECRET, { expiresIn: '720h' });
+  .then(async u => {
+    const validPassword = await bcrypt.compare(
+      password,
+      u.password
+    );
 
-    res.statusCode = StatusCodes.OK
-    res.send({
-      ok: true,
-      msg: "logged in succesfully",
-      token
-    })
+    if (validPassword)
+    {
+
+      var token = jwt.sign({ name: username }, process.env.TOKEN_SECRET, { expiresIn: '720h' });
+
+      res.statusCode = StatusCodes.OK
+      res.send({
+        ok: true,
+        msg: "logged in succesfully",
+        token
+      })
+    }
+    else
+    {
+      res.statusCode = StatusCodes.UNAUTHORIZED
+      res.send({
+        ok: false,
+        msg: "Incorrect username or password"
+      })
+    }
   })
   .catch(e => {
     console.log(e.message)
